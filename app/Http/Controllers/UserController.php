@@ -30,9 +30,17 @@ class UserController extends Controller
     {
         return $validator = Validator::make(
             array(
-                'fb_id' => Input::get('fb_id')
+                'fb_id' => Input::get('fb_id'),
+                'img_hash' => Input::get('img_hash'),
+                'age' => Input::get('age'),
+                'gender' => Input::get('gender'),
+                'name' => Input::get('name')
             ), array(
-                'fb_id' => 'required'
+                'fb_id' => 'required',
+                'img_hash' => 'required',
+                'age' => 'required',
+                'gender' => 'required',
+                'name' => 'required'
             )
         );
     }
@@ -43,7 +51,7 @@ class UserController extends Controller
             array(
                 'fb_id' => Input::get('fb_id')
             ), array(
-                'fb_id' => 'required'
+            'fb_id' => 'required'
         ));
     }
 
@@ -86,7 +94,7 @@ class UserController extends Controller
         $user = new User();
         $data = Input::all();
         $users = $user->discoverUsers($data);
-            $msg = "Discovered user list.";
+        $msg = "Discovered user list.";
         return $this->successMessageWithVar($msg, $users);
     }
 
@@ -120,7 +128,7 @@ class UserController extends Controller
         }
         //check if user exist with same fb_id then update user info instead of insert new entry
         $userId = $user->getUserIdAttachedWithFbId($data['fb_id']);
-        if($userId){
+        if ($userId) {
             $data['user_id'] = $userId;
         }
         $img_hash = $user->imageUpload($data['img_hash'], $this->uploaddir);
@@ -178,10 +186,10 @@ class UserController extends Controller
             }
             return $this->errorMessage($msg);
         }
-        if(isset($data['img_hash']) and ! empty($data['img_hash'])){
+        if (isset($data['img_hash']) and !empty($data['img_hash'])) {
             $imageBase64Data = $data['img_hash'];
             $img_hash = $user->imageUpload($imageBase64Data, $this->uploaddir);
-            if (isset($img_hash) and ! empty($img_hash)) {
+            if (isset($img_hash) and !empty($img_hash)) {
                 $data['img_hash'] = $img_hash;
             }
         }
@@ -206,7 +214,7 @@ class UserController extends Controller
     public function updateDeviceStatus($id)
     {
         $data = Input::all();
-        if ((isset($data['lat'])) && ($data['lng'] == '0')){
+        if ((isset($data['lat'])) && ($data['lng'] == '0')) {
             $msg = "Device detail not updated.";
             return $this->errorMessage($msg);
         }
@@ -222,7 +230,7 @@ class UserController extends Controller
         $data = Input::all();
         $data['user_id'] = $id;
         $user = new User();
-        if(!$user->isUserAlreadyBlocked($data)){
+        if (!$user->isUserAlreadyBlocked($data)) {
             $user->blockUser($data);
         }
         $msg = "User blocked successfully.";
@@ -236,7 +244,7 @@ class UserController extends Controller
         $user = new User();
         $senderDetails = $user->getUserDetail($id);
         $receiversInfo = $user->getUsersForSendNotification($inputData);
-        foreach($receiversInfo as $receiverInfo){
+        foreach ($receiversInfo as $receiverInfo) {
             $user->sendPushNotification($senderDetails, $receiverInfo);
         }
         $msg = "Message sent successfully.";
@@ -271,10 +279,10 @@ class UserController extends Controller
         // Send it to the server
         fwrite($fp, $msg, strlen($msg));
 
-       /* if (!$result)
-                echo 'Error, notification not sent' . PHP_EOL;
-            else
-               echo 'notification sent!' . PHP_EOL;*/
+        /* if (!$result)
+                 echo 'Error, notification not sent' . PHP_EOL;
+             else
+                echo 'notification sent!' . PHP_EOL;*/
         // Close the connection to the server
         fclose($fp);
 
@@ -297,5 +305,9 @@ class UserController extends Controller
         $user->updateUserSocialNetworks($data, "id", $id);
         $msg = "User social network detail updated successfully.";
         return $this->successMessage($msg);
+    }
+
+    public function getFullDetail(){
+
     }
 }

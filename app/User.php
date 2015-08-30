@@ -73,26 +73,11 @@ class User extends Model implements AuthenticatableContract, CanResetPasswordCon
         if (isset($data['city'])) {
             $user->city = $data['city'];
         }
-        if (isset($data['interests'])) {
-            $user->interests = $data['interests'];
-        }
         if (isset($data['img_hash'])) {
-            $user->img_url = $data['img_hash'];
+            $user->img_hash = $data['img_hash'];
         }
         if (isset($data['email'])) {
             $user->email = $data['email'];
-        }
-        if (isset($data['linkedin_id'])) {
-            $user->linkedin_id = $data['linkedin_id'];
-            $user->linkedin_status = $data['linkedin_status'];
-        }
-        if (isset($data['twitter_id'])) {
-            $user->twitter_id = $data['twitter_id'];
-            $user->twitter_status = $data['twitter_status'];
-        }
-        if (isset($data['instagram_id'])) {
-            $user->instagram_id = $data['instagram_id'];
-            $user->instagram_status = $data['instagram_status'];
         }
         $user->save();
         return $user;
@@ -211,6 +196,17 @@ class User extends Model implements AuthenticatableContract, CanResetPasswordCon
     {
         $data['updated_at'] = date('Y-m-d H:i:s');
         DB::table('users')->where($onField, $onValue)->update($data);
+    }
+
+    public function getFullDetails(){
+        return DB::select(DB::raw("SELECT id as parking_id,user_id as vendor_id,img_hash as parking_image,name as parking_name,add_1,add_2,state,zip,start_time,end_time,lat,lng,instruction,rate,status,created_at,updated_at, ( 3959 * acos( cos( radians( $lat ) ) * cos( radians( lat ) ) * cos( radians( lng ) - radians( $lng ) ) + sin( radians( $lat ) ) * sin( radians( lat ) ) ) ) AS distance
+        FROM parking_details
+        WHERE status = 'Open'
+        AND ((start_time < '$currentTime' AND end_time > '$oneHourExtened')
+        OR (start_time is NULL))
+        HAVING distance < $radius
+        ORDER BY distance asc
+        LIMIT 0 , 20"));
     }
 
 }

@@ -15,13 +15,12 @@ class CreateUsersTable extends Migration
         Schema::create('users', function (Blueprint $table) {
             $table->increments('id');
             $table->bigInteger('fb_id')->unique();
-            $table->string('img_url');
+            $table->string('img_hash');
             $table->string('age');
             $table->string('gender');
             $table->string('name');
             $table->string('occupation')->nullable();
             $table->string('city')->nullable();
-            $table->string('interests')->nullable();
             $table->string('email')->nullable();
             $table->string('linkedin_id')->nullable();
             $table->string('twitter_id')->nullable();
@@ -29,7 +28,9 @@ class CreateUsersTable extends Migration
             $table->enum('linkedin_status', ['on', 'off'])->default('off');
             $table->enum('twitter_status', ['on', 'off'])->default('off');
             $table->enum('instagram_status', ['on', 'off'])->default('off');
-            $table->enum('visibility', ['on', 'off'])->default('off');
+            $table->enum('visibility', ['on', 'off'])->default('on');
+            $table->string('lat');
+            $table->string('lng');
             $table->timestamps();
         });
     }
