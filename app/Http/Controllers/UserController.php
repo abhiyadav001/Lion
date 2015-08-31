@@ -307,7 +307,23 @@ class UserController extends Controller
         return $this->successMessage($msg);
     }
 
-    public function getFullDetail(){
+    public function getFullDetail($fbID, $lat, $lng)
+    {
+        $user = new User();
+        $data = Input::all();
 
+        $totalData = count($data);
+        $fbIdArray = array();
+        for ($i = 0; $i < $totalData; $i++) {
+            $userWithoutBlock = $user->checkBlockList($fbID, $data[$i]);
+            if (!empty($userWithoutBlock)) {
+                array_push($fbIdArray, $data[$i]);
+            }
+        }
+        $changeArray = implode(", ", $fbIdArray);
+
+        $userDetail = $user->getFullDetails($lat, $lng, '10', $changeArray);
+        $msg = "Fetched successfully.";
+        return $this->successMessageWithVar($msg, $userDetail);
     }
 }

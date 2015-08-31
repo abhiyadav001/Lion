@@ -19,6 +19,8 @@ Route::get('/', function () {
  * add and edit user profile
  */
 Route::resource('users', 'UserController');
+post('users/{fb_id}/get-details/{lat}/{lng}', 'UserController@getFullDetail');
+
 /*
  * update device status like(lat, lng, last_signup)
  */

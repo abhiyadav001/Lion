@@ -67,7 +67,7 @@ class User extends Model implements AuthenticatableContract, CanResetPasswordCon
         if (isset($data['occupation'])) {
             $user->occupation = $data['occupation'];
         }
-        if(isset($data['name'])){
+        if (isset($data['name'])) {
             $user->name = $data['name'];
         }
         if (isset($data['city'])) {
@@ -92,7 +92,7 @@ class User extends Model implements AuthenticatableContract, CanResetPasswordCon
 
     public function isUserAlreadyBlocked($data)
     {
-        if(DB::table('users_block_info')->where("user_fb_id", '=', $data['user_fb_id'])->where("blocked_user_fb_id", '=', $data['blocked_user_fb_id'])->select('id')->get()){
+        if (DB::table('users_block_info')->where("user_fb_id", '=', $data['user_fb_id'])->where("blocked_user_fb_id", '=', $data['blocked_user_fb_id'])->select('id')->get()) {
             return true;
         }
         return false;
@@ -198,15 +198,27 @@ class User extends Model implements AuthenticatableContract, CanResetPasswordCon
         DB::table('users')->where($onField, $onValue)->update($data);
     }
 
-    public function getFullDetails(){
-        return DB::select(DB::raw("SELECT id as parking_id,user_id as vendor_id,img_hash as parking_image,name as parking_name,add_1,add_2,state,zip,start_time,end_time,lat,lng,instruction,rate,status,created_at,updated_at, ( 3959 * acos( cos( radians( $lat ) ) * cos( radians( lat ) ) * cos( radians( lng ) - radians( $lng ) ) + sin( radians( $lat ) ) * sin( radians( lat ) ) ) ) AS distance
-        FROM parking_details
-        WHERE status = 'Open'
-        AND ((start_time < '$currentTime' AND end_time > '$oneHourExtened')
-        OR (start_time is NULL))
+    public function getFullDetails($lat, $lng, $radius, $fbIdArray)
+    {
+        return DB::select(DB::raw("SELECT users.*,users_device_details.lat,users_device_details.lng, ( 3959 * acos( cos( radians( $lat ) ) * cos( radians( users_device_details.lat ) ) * cos( radians( users_device_details.lng ) - radians( $lng ) ) + sin( radians( $lat ) ) * sin( radians( users_device_details.lat ) ) ) ) AS distance
+        FROM users inner join users_device_details on users.id = users_device_details.user_id
+        WHERE users.visibility = 'on'
+        and users.fb_id not in ($fbIdArray)
         HAVING distance < $radius
         ORDER BY distance asc
         LIMIT 0 , 20"));
     }
 
+    public function checkBlockList($fbId, $frndFbId)
+    {
+        $userId = DB::table('users_block_info')
+            ->orWhere(function ($query) use ($fbId, $frndFbId) {
+                $query->where('user_fb_id', $frndFbId)->where('blocked_user_fb_id', $fbId);
+            })
+            ->orWhere(function ($query) use ($fbId, $frndFbId) {
+                $query->where('user_fb_id', $fbId)->where('blocked_user_fb_id', $frndFbId);
+            })
+            ->get();
+        return $userId;
+    }
 }
