@@ -310,6 +310,7 @@ class UserController extends Controller
     public function getFullDetail($fbID, $lat, $lng)
     {
         $user = new User();
+        $deviceDetail = new DeviceDetails();
         $data = Input::all();
 
         $totalData = count($data);
@@ -322,8 +323,12 @@ class UserController extends Controller
         }
         $nonBlock = array_diff($data, $fbIdArray);
         $changeArray = implode(", ", $nonBlock);
-
         $userDetail = $user->getFullDetails($lat, $lng, '10', $changeArray);
+
+        $latLngArray = array('lat' => $lat, 'lng' => $lng);
+        $userID = $user->getUserIdAttachedWithFbId($fbID);
+        $deviceDetail->updateDeviceDetails($latLngArray, 'user_id', $userID);
+        
         $msg = "Fetched successfully.";
         return $this->successMessageWithVar($msg, $userDetail);
     }
