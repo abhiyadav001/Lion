@@ -320,7 +320,8 @@ class UserController extends Controller
                 array_push($fbIdArray, $data[$i]);
             }
         }
-        $changeArray = implode(", ", $fbIdArray);
+        $nonBlock = array_diff($data, $fbIdArray);
+        $changeArray = implode(", ", $nonBlock);
 
         $userDetail = $user->getFullDetails($lat, $lng, '10', $changeArray);
         $msg = "Fetched successfully.";

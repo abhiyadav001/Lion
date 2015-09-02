@@ -203,7 +203,7 @@ class User extends Model implements AuthenticatableContract, CanResetPasswordCon
         return DB::select(DB::raw("SELECT users.*,users_device_details.lat,users_device_details.lng, ( 3959 * acos( cos( radians( $lat ) ) * cos( radians( users_device_details.lat ) ) * cos( radians( users_device_details.lng ) - radians( $lng ) ) + sin( radians( $lat ) ) * sin( radians( users_device_details.lat ) ) ) ) AS distance
         FROM users inner join users_device_details on users.id = users_device_details.user_id
         WHERE users.visibility = 'on'
-        and users.fb_id not in ($fbIdArray)
+        and users.fb_id in ($fbIdArray)
         HAVING distance < $radius
         ORDER BY distance asc
         LIMIT 0 , 20"));
