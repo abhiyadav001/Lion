@@ -187,6 +187,12 @@ class User extends Model implements AuthenticatableContract, CanResetPasswordCon
         return $userId;
     }
 
+    public function getFbIdAttachedWithUserId($Id)
+    {
+        $FbId = DB::table('users')->where('id', $Id)->pluck('fb_id');
+        return $FbId;
+    }
+
     public function changeUserVisibility($data)
     {
         DB::table('users')->where('id', $data['user_id'])->update(['visibility' => $data['visibility']]);

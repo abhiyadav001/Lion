@@ -293,7 +293,10 @@ class UserController extends Controller
         $data = Input::all();
         $data['user_id'] = $id;
         $user = new User();
+        $deviceDetail = new DeviceDetails();
         $user->changeUserVisibility($data);
+        $latLngArray = array('lat' => $data['lat'], 'lng' => $data['lng']);
+        $deviceDetail->updateDeviceDetails($latLngArray, 'user_id', $id);
         $msg = "User visibility change successfully.";
         return $this->successMessage($msg);
     }
@@ -307,11 +310,12 @@ class UserController extends Controller
         return $this->successMessage($msg);
     }
 
-    public function getFullDetail($fbID, $lat, $lng)
+    public function getFullDetail($id, $lat, $lng)
     {
         $user = new User();
         $deviceDetail = new DeviceDetails();
         $data = Input::all();
+        $fbID = $user->getFbIdAttachedWithUserId($id);
 
         $totalData = count($data);
         $fbIdArray = array();
@@ -326,9 +330,8 @@ class UserController extends Controller
         $userDetail = $user->getFullDetails($lat, $lng, '10', $changeArray);
 
         $latLngArray = array('lat' => $lat, 'lng' => $lng);
-        $userID = $user->getUserIdAttachedWithFbId($fbID);
-        $deviceDetail->updateDeviceDetails($latLngArray, 'user_id', $userID);
-        
+        $deviceDetail->updateDeviceDetails($latLngArray, 'user_id', $id);
+
         $msg = "Fetched successfully.";
         return $this->successMessageWithVar($msg, $userDetail);
     }
