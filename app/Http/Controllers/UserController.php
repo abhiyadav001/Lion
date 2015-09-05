@@ -327,7 +327,7 @@ class UserController extends Controller
         }
         $nonBlock = array_diff($data, $fbIdArray);
         $changeArray = implode(", ", $nonBlock);
-        $userDetail = $user->getFullDetails($lat, $lng, '10', $changeArray);
+        $userDetail = $user->getFullDetails($lat, $lng, '100', $changeArray);
 
         $latLngArray = array('lat' => $lat, 'lng' => $lng);
         $deviceDetail->updateDeviceDetails($latLngArray, 'user_id', $id);
