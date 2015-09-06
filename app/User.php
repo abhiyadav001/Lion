@@ -117,13 +117,12 @@ class User extends Model implements AuthenticatableContract, CanResetPasswordCon
 
     public function getUserDetail($userId)
     {
-        return App\User::find($userId);
-//        return DB::table('users')
-//            ->join('users_device_details', 'users_device_details.user_id', '=', 'users.id')
-//            ->select('users.*','users_device_details.lat','users_device_details.lng')
-//            ->where('users.id', '=', $userId)
-//            ->orderBy('id', 'desc')
-//            ->first();
+        return DB::table('users')
+            ->join('users_device_details', 'users_device_details.user_id', '=', 'users.id')
+            ->select('users.*','users_device_details.lat','users_device_details.lng')
+            ->where('users_device_details.user_id', '=', $userId)
+            ->orderBy('users_device_details.id', 'desc')
+            ->first();
     }
 
     public function getUsersForSendNotification($data)
