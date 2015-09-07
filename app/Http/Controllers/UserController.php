@@ -136,6 +136,8 @@ class UserController extends Controller
             $data['img_hash'] = $img_hash;
         }
         $userProfile = $user->insert($data);
+        $userProfile->lat = $data['lat'];
+        $userProfile->lng = $data['lng'];
         $data['user_id'] = $userProfile->id;
         $deviceDetail->insert($data);
         $msg = "Profile saved successfully.";
