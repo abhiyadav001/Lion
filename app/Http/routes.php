@@ -21,6 +21,7 @@ Route::get('/', function () {
 Route::resource('users', 'UserController');
 post('users/{id}/get-details/{lat}/{lng}', 'UserController@getFullDetail');
 Route::resource('notifications', 'NotificationController');
+Route::resource('chats', 'ChatController');
 
 /*
  * update device status like(lat, lng, last_signup)
