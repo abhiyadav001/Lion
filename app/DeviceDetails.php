@@ -45,4 +45,12 @@ class DeviceDetails extends Model
             DB::table('users_device_details')->where($onField, $onValue)->update($data);
         }
     }
+
+    public function getLatestDetailByUserId($userId)
+    {
+        return DB::table('users_device_details')
+            ->where('users_device_details.user_id', '=', $userId)
+            ->orderBy('users_device_details.last_signup', 'desc')
+            ->pluck('token');
+    }
 }
