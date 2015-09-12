@@ -3,7 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-
+use Input;
+use Pusher;
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
 
@@ -26,7 +27,7 @@ class ChatController extends Controller
      */
     public function create()
     {
-        //
+
     }
 
     /**
@@ -37,7 +38,8 @@ class ChatController extends Controller
      */
     public function store()
     {
-        //
+        $pusher = new Pusher( 'f52f0d0ddf0322ff7661', 'b8bf77e415c0c57e1921', '140367' );
+        $pusher->trigger( Input::get('channel'), Input::get('event'), Input::get('message') );
     }
 
     /**
