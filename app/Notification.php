@@ -38,6 +38,7 @@ class Notification extends Model
     public function sendPushNotification($data, $deviceToken)
     {
         $notificationInfo = $this->saveNotification($data);
+
         $passphrase = 'wuumz2';
 
         $ctx = stream_context_create();
@@ -47,7 +48,7 @@ class Notification extends Model
         $fp = stream_socket_client('ssl://gateway.sandbox.push.apple.com:2195', $err, $errstr, 60, STREAM_CLIENT_CONNECT | STREAM_CLIENT_PERSISTENT, $ctx);
 
         $body['aps'] = array('alert' => $data['message'], 'sound' => 'default',
-            'sender_id' => $data['sender_id'], 'sender_name' => $data['sender_name'], 'notifyId' => @$notificationInfo->id, 'exp_at' => @$notificationInfo->expired_at);
+            'sender_id' => $data['sender_id'], 'sender_name' => $data['sender_name'], 'requestId' => @$notificationInfo->id, 'exp_at' => @$notificationInfo->expired_at);
 
         $payload = json_encode($body);
 
@@ -59,6 +60,7 @@ class Notification extends Model
         fwrite($fp, $msg, strlen($msg));
 
         fclose($fp);
+        return $notificationInfo->id;
     }
 
     public function saveNotification($data)

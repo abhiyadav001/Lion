@@ -36,7 +36,7 @@ class NotificationController extends Controller
                 'success' => true,
                 'messages' => $msg,
                 'response' => array(
-                    'users' => $userUpdated)
+                    'id' => $userUpdated)
             ), 200
         );
     }
@@ -114,7 +114,7 @@ class NotificationController extends Controller
         $data = Input::all();
         $reciverToken = $deviceDetail->getLatestDetailByUserId($data['reciver_id']);
         $sendNotification = $notification->sendConfNotification($data, $reciverToken, $id);
-        $msg = "Successfully.";
+        $msg = "Your location is send successfully.";
         return $this->successMessageWithVar($msg, $sendNotification);
     }
 
