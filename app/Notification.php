@@ -21,7 +21,7 @@ class Notification extends Model
         $fp = stream_socket_client('ssl://gateway.sandbox.push.apple.com:2195', $err, $errstr, 60, STREAM_CLIENT_CONNECT | STREAM_CLIENT_PERSISTENT, $ctx);
 
         $body['aps'] = array('alert' => $data['message'], 'sound' => 'default',
-            'sender_id' => $data['sender_id'], 'sender_name' => $data['sender_name'], 'lat' => $data['lat'], 'lng' => $data['lng']);
+            'sender_id' => $data['sender_id'], 'sender_name' => $data['sender_name'], 'lat' => $data['lat'], 'lng' => $data['lng'], 'requestId' =>$id);
 
         $payload = json_encode($body);
 
