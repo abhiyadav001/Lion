@@ -20,7 +20,7 @@ class CreateNotificationTable extends Migration
             $table->string('message');
             $table->enum('status', array('rejected', 'confirmed'))->nullable();
             $table->string('expired_at');
-
+            $table->string('type');
             $table->timestamps();
         });
     }

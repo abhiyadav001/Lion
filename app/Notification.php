@@ -1,6 +1,7 @@
 <?php
 
 namespace App;
+
 use DB;
 use Illuminate\Database\Eloquent\Model;
 
@@ -11,7 +12,7 @@ class Notification extends Model
 
     public function sendConfNotification($data, $deviceToken, $id)
     {
-        DB::table('notifications')->where('id', $id)->update(['status' => $data['status']]);
+        DB::table('notifications')->where('id', $id)->update(['status' => $data['status'], 'type' => $data['type']]);
         $passphrase = 'wuumz2';
 
         $ctx = stream_context_create();
@@ -21,7 +22,7 @@ class Notification extends Model
         $fp = stream_socket_client('ssl://gateway.sandbox.push.apple.com:2195', $err, $errstr, 60, STREAM_CLIENT_CONNECT | STREAM_CLIENT_PERSISTENT, $ctx);
 
         $body['aps'] = array('alert' => $data['message'], 'sound' => 'default',
-            'sender_id' => $data['sender_id'], 'sender_name' => $data['sender_name'], 'lat' => $data['lat'], 'lng' => $data['lng'], 'requestId' =>$id);
+            'sender_id' => $data['sender_id'], 'sender_name' => $data['sender_name'], 'type' => $data['type'], 'lat' => $data['lat'], 'lng' => $data['lng'], 'requestId' => $id);
 
         $payload = json_encode($body);
 
@@ -48,7 +49,7 @@ class Notification extends Model
         $fp = stream_socket_client('ssl://gateway.sandbox.push.apple.com:2195', $err, $errstr, 60, STREAM_CLIENT_CONNECT | STREAM_CLIENT_PERSISTENT, $ctx);
 
         $body['aps'] = array('alert' => $data['message'], 'sound' => 'default',
-            'sender_id' => $data['sender_id'], 'sender_name' => $data['sender_name'], 'requestId' => @$notificationInfo->id, 'exp_at' => @$notificationInfo->expired_at);
+            'sender_id' => $data['sender_id'], 'sender_name' => $data['sender_name'], 'type' => $data['type'], 'requestId' => @$notificationInfo->id, 'exp_at' => @$notificationInfo->expired_at);
 
         $payload = json_encode($body);
 
@@ -73,6 +74,7 @@ class Notification extends Model
         $notify->sender_id = $data['sender_id'];
         $notify->reciver_id = $data['reciver_id'];
         $notify->message = $data['message'];
+        $notify->type = $data['type'];
         $notify->expired_at = $expire;
         $notify->save();
         return $notify;
