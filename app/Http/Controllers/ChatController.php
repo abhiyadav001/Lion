@@ -3,7 +3,7 @@ namespace App\Http\Controllers;
 use Ratchet\MessageComponentInterface;
 use Ratchet\ConnectionInterface;
 
-class ChatController extends Controller implements MessageComponentInterface {
+class ChatController implements MessageComponentInterface {
     protected $clients;
 
     public function __construct() {
