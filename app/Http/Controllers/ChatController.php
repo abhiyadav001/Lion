@@ -43,3 +43,4 @@ class ChatController implements MessageComponentInterface {
         $conn->close();
     }
 }
+?>
