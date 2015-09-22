@@ -3,43 +3,54 @@ namespace App\Http\Controllers;
 use Ratchet\MessageComponentInterface;
 use Ratchet\ConnectionInterface;
 
-class ChatController implements MessageComponentInterface {
+class ChatController implements MessageComponentInterface
+{
     protected $clients;
+    private $subscriptions;
+    private $users;
 
-    public function __construct() {
+    public function __construct()
+    {
         $this->clients = new \SplObjectStorage;
+        $this->subscriptions = [];
+        $this->users = [];
     }
 
-    public function onOpen(ConnectionInterface $conn) {
-        // Store the new connection to send messages to later
+    public function onOpen(ConnectionInterface $conn)
+    {
         $this->clients->attach($conn);
-
-        echo "New connection! ({$conn->resourceId})\n";
+        $this->users[$conn->resourceId] = $conn;
     }
 
-    public function onMessage(ConnectionInterface $from, $msg) {
-        $numRecv = count($this->clients) - 1;
-        echo sprintf('Connection %d sending message "%s" to %d other connection%s' . "\n"
-            , $from->resourceId, $msg, $numRecv, $numRecv == 1 ? '' : 's');
-
-        foreach ($this->clients as $client) {
-            if ($from !== $client) {
-                // The sender is not the receiver, send to each client connected
-                $client->send($msg);
-            }
+    public function onMessage(ConnectionInterface $conn, $msg)
+    {
+        $data = json_decode($msg);
+        switch ($data->command) {
+            case "subscribe":
+                $this->subscriptions[$conn->resourceId] = $data->channel;
+                break;
+            case "message":
+                if (isset($this->subscriptions[$conn->resourceId])) {
+                    $target = $this->subscriptions[$conn->resourceId];
+                    foreach ($this->subscriptions as $id=>$channel) {
+                        if ($channel == $target && $id != $conn->resourceId) {
+                            $this->users[$id]->send($data->message);
+                        }
+                    }
+                }
         }
     }
 
-    public function onClose(ConnectionInterface $conn) {
-        // The connection is closed, remove it, as we can no longer send it messages
+    public function onClose(ConnectionInterface $conn)
+    {
         $this->clients->detach($conn);
-
-        echo "Connection {$conn->resourceId} has disconnected\n";
+        unset($this->users[$conn->resourceId]);
+        unset($this->subscriptions[$conn->resourceId]);
     }
 
-    public function onError(ConnectionInterface $conn, \Exception $e) {
+    public function onError(ConnectionInterface $conn, \Exception $e)
+    {
         echo "An error has occurred: {$e->getMessage()}\n";
-
         $conn->close();
     }
 }
