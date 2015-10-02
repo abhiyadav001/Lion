@@ -83,6 +83,20 @@ class User extends Model implements AuthenticatableContract, CanResetPasswordCon
         return $user;
     }
 
+    public function getBlockList($fbID)
+    {
+       return DB::table('users_block_info')
+            ->join('users', 'users_block_info.blocked_user_fb_id', '=', 'users.fb_id')
+            ->select('users_block_info.blocked_user_fb_id','users.name','users.img_hash')
+            ->where('users_block_info.user_fb_id', '=', $fbID)
+            ->get();
+    }
+
+    public function unblockUser($data)
+    {
+       return DB::table('users_block_info')->where('user_fb_id', '=', $data['user_fb_id'])->where('blocked_user_fb_id', '=', $data['blocked_user_fb_id'])->delete();
+    }
+
     public function blockUser($data)
     {
         $blockUser = DB::table('users_block_info')->insert(

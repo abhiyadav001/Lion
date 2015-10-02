@@ -32,6 +32,8 @@ post('users/{id}/device', 'UserController@updateDeviceStatus');
  * block users
  */
 post('users/{id}/block', 'UserController@blockUsers');
+post('users/{id}/un-block', 'UserController@unblockUsers');
+get('users/{id}/block', 'UserController@listBlockUsers');
 /*
  * user notification
  */

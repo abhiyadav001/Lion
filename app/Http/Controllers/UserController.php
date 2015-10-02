@@ -227,6 +227,31 @@ class UserController extends Controller
         return $this->successMessage($msg);
     }
 
+    public function listBlockUsers($id)
+    {
+        $user = new User();
+        $fbID = $user->getFbIdAttachedWithUserId($id);
+        $blockedList = $user->getBlockList($fbID);
+        if (empty($blockedList))
+        {
+            $msg = "No Record Found";
+            return $this->errorMessage($msg);
+        }
+        $msg = "Fetched successfully.";
+        return $this->successMessageWithVar($msg, $blockedList);
+    }
+
+    public function unblockUsers($id)
+    {
+        $data = Input::all();
+        $data['user_id'] = $id;
+        $user = new User();
+        $user->unblockUser($data);
+        $msg = "User unblock successfully.";
+        return $this->successMessage($msg);
+
+    }
+
     public function blockUsers($id)
     {
         $data = Input::all();
